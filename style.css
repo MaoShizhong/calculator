@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@400;700&display=swap');
+
+body {
+    background-color: #19171d;
+    color: white;
+    font-family: 'Oxygen', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: #020202;
+    border-radius: 30px;
+    display: grid;
+    grid-template-rows: repeat(40, 1em);
+    grid-template-columns: repeat(20, 1em);
+    padding: 6px;
+}
+
+.screen {
+    grid-row: 2 / 14;
+    grid-column: 2 / 20;
+    padding: 3px;
+}
+
+#equation,
+#result {
+    width: 98%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+#equation {
+    color: #b6a6cf;
+    height: 45%;
+    font-size: 22px;
+}
+
+#result {
+    height: 55%;
+    font-size: 56px;
+}
+
+.buttons {
+    grid-row: 18 / 39;
+    grid-column: 2 / 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+button,
+button:hover {
+    border: none;
+    border-radius: 28px;
+    color: white;
+    font-family: 'Oxygen', Arial, sans-serif;
+    font-size: 24px;
+    text-align: center;
+    height: 56px;
+    width: 56px;
+    cursor: pointer;
+}
+
+
+.number {
+    background-color: #130d1a;
+}
+
+.operation {
+    background-color: #22132e;
+    padding-bottom: 3px;
+}
+
+#clear {
+    padding-right: 9px;
+}
+
+#backspace {
+    font-size: 18px;
+    padding-bottom: 2px;
+    padding-right: 7px;
+}
+
+#divide,
+#multiply,
+#plus {
+    padding-bottom: 6px;
+}
+
+#equals {
+    background-color: #270d1a;
+    padding-bottom: 5px;
+}

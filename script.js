@@ -1,5 +1,6 @@
 const buttons = document.querySelectorAll(".basic");
 const layout = document.querySelector("#slider");
+const equation = document.querySelector("#equation");
 
 layout.addEventListener("click", function() {
     const extraButtons = document.querySelectorAll(".extra");

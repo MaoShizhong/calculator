@@ -2,7 +2,7 @@
 
 body {
     background-color: #19171d;
-    color: white;
+    color: #b6a6cf;
     font-family: 'Oxygen', Arial, sans-serif;
     display: flex;
     flex-direction: column;
@@ -15,31 +15,33 @@ body {
     background-color: #020202;
     border-radius: 30px;
     display: grid;
-    grid-template-rows: repeat(40, 1em);
+    grid-template-rows: repeat(39, 1em);
     grid-template-columns: repeat(20, 1em);
     padding: 6px;
 }
 
-#extend,
-#reduce {
+#slider {
     background-color: transparent;
-    border: 2px solid #64576e;
     border-radius: 20px;
-    color: #64576e;
-    font-family: 'Oxygen', Arial, sans-serif;
-    font-weight: 700;
-    font-size: 20px;
-    width: 56px;
     padding: 0 14px 3px;
-    transition: none;
     grid-row: 15 / 17;
-    grid-column: 2 / 9;
-    justify-self: flex-start;
+    grid-column-start: 1;
+    justify-content: flex-start;
 }
 
-#reduce {
-    padding-bottom: 21px;
-    width: 46px;
+#slider img {
+    height: auto;
+    width: 50px;
+    padding: 0 0 0 3px;
+}
+
+#extend {
+    color: #9689ac;
+    font-size: 0.8em;
+    padding-top: 5px;
+    padding-left: 12px;
+    grid-row-start: 15;
+    grid-column-start: 5;
 }
 
 .screen {
@@ -55,16 +57,16 @@ body {
     margin-right: auto;
     display: flex;
     justify-content: flex-end;
-    align-items: flex-end;
+    align-items: center;
 }
 
 #equation {
-    color: #b6a6cf;
     height: 45%;
     font-size: 22px;
 }
 
 #result {
+    color: white;
     height: 55%;
     font-size: 56px;
 }
@@ -103,7 +105,6 @@ button {
     background-color: #19171d;
     border: none;
     padding: 0;
-    transition: all 0.4s;
     display: flex;
     justify-content: center;
     align-items: center;

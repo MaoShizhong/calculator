@@ -50,7 +50,7 @@ body {
     padding: 3px;
 }
 
-#operation,
+#equation,
 #result {
     width: 98%;
     margin-left: auto;
@@ -60,7 +60,7 @@ body {
     align-items: center;
 }
 
-#operation {
+#equation {
     height: 45%;
     font-size: 28px;
 }

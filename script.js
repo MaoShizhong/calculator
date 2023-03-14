@@ -1,14 +1,16 @@
 const allCalcButtons = document.querySelectorAll(".button");
 const layout = document.querySelector("#slider");
 
-const operationScreen = document.querySelector("#operation");
-const screen = document.querySelector("#result");
+const equation = document.querySelector("#equation");
+const results = document.querySelector("#result");
 
 let a;
 let b;
+let equationLength;
 let operationInUse = "none";
-let enteringNumbers = false;
-let screenCleared;
+let calculationRunning = false;
+let answerGiven = false;
+let isSpecial = false;
 
 layout.addEventListener("click", changeLayout);
 
@@ -16,73 +18,92 @@ const clear = document.querySelector("#clear");
 clear.addEventListener("click", function() {
     a = b = undefined;
     operationInUse = "none";
-    operationScreen.textContent = "";
-    screen.textContent = "";
+    equation.textContent = "";
+    results.textContent = "";
+    answerGiven = false;
+    isSpecial = false;
 });
 
 const backspace = document.querySelector("#backspace");
 backspace.addEventListener("click", function() {
-    let backspaced = screen.textContent.slice(0, -1);
-    screen.textContent = `${backspaced}`;
+    let backspaced = results.textContent.slice(0, -1);
+    results.textContent = `${backspaced}`;
 });
 
 const numbers = document.querySelectorAll(".number");
 for (let i = 0; i < numbers.length; i++) {
     numbers[i].addEventListener("click", function() {
-        if (operationInUse !== "none") {
-            operationScreen.textContent = `${a} ${operationInUse}`;
+        if(answerGiven) {
+            clear.click();
         }
-        if (!screenCleared) {
-            screen.textContent = "";
-            screenCleared = true;
-        }
-
-        screen.textContent += numbers[i].value
+        equation.textContent += numbers[i].value;
     });
 }
 
 const simpleOperations = document.querySelectorAll(".operation");
 for (let i = 0; i < simpleOperations.length; i++) {
     simpleOperations[i].addEventListener("click", function() {
-        if (chainOperations()) {
-            equals.click();
+        operationInUse = simpleOperations[i].value;
+
+        if (chainingOperations()) {
+            equation.textContent += `${results.textContent} ${operationInUse} `;
+            results.textContent = "";
+            
+            answerGiven = false;
+            calculationRunning = true;
+            equationLength = equation.textContent.length;
+            return;
+        }
+        
+        if (calculationRunning) {
+            equation.textContent = equation.textContent.slice(0, -3);
         }
 
-        operationInUse = simpleOperations[i].value;
-        operationScreen.textContent = `${operationInUse}`;
-
-        inCalculation = true;
-        storeFirstNumber();
-        b = undefined;
-        screenCleared = false;
+        calculationRunning = true;
+        equation.textContent += ` ${operationInUse} `;
+        equationLength = equation.textContent.length;
     });
 }
 
 const equals = document.querySelector("#equals");
 equals.addEventListener("click", function() {
-    storeSecondNumber();
-    if (operationInUse !== "none") {
-        operationScreen.textContent = `${a} ${operationInUse} ${b}`;
+    // clicking = with answer showing does not increment
+    if (answerGiven) {
+        return;
     }
 
+    // prevent normal = function for special operation syntax
+    if (isSpecial) {
+        // doSpecialOperation();
+        return;
+    }
+
+    if (operationInUse === "none") {
+        results.textContent = `${parseFloat(equation.textContent)}`;
+        equation.textContent = "";
+        answerGiven = true;
+        calculationRunning = false;  
+        return;
+    }
+
+    a = parseFloat(equation.textContent);
+    b = parseFloat(equation.textContent.slice(equationLength));
+    equation.textContent = "";
+    
     let answer = isFloat(a, b) ? calculateWithFloat(a, b) : calculate(a, b);
     if (hasManyDecimals(answer)) {
         answer = Math.round(answer * 100000) / 100000;
     }
-    screen.textContent = `${answer}`;
+
+    results.textContent = `${answer}`;
+
+    answerGiven = true;
+    calculationRunning = false;
 });
 
 
-function chainOperations() {
-    return (a !== undefined && b === undefined && screen.textContent !== "");
-}
-
-function storeFirstNumber() {
-    a = parseFloat(screen.textContent);
-}
-
-function storeSecondNumber() {
-    b = parseFloat(screen.textContent);
+function chainingOperations() {
+    return (equation.textContent === "" && results.textContent !== "");
 }
 
 function isFloat(a, b) {
@@ -98,7 +119,7 @@ function calculate(a, b) {
          : (operationInUse === "\u{000F7}") ? a / b
          : (operationInUse === "\u{0002B}") ? a + b
          : (operationInUse === "\u{02212}") ? a - b
-         : parseFloat(screen.textContent);
+         : parseFloat(results.textContent);
 }
 
 function calculateWithFloat(a, b) {
@@ -107,7 +128,7 @@ function calculateWithFloat(a, b) {
          : (operationInUse === "\u{000F7}") ? (a * CF) / (b * CF)
          : (operationInUse === "\u{0002B}") ? ((a * CF) + (b * CF)) / CF
          : (operationInUse === "\u{02212}") ? (a * CF) - (b * CF) / CF
-         : parseFloat(screen.textContent);
+         : parseFloat(results.textContent);
 }
 
 function changeLayout() {

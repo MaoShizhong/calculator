@@ -226,7 +226,7 @@ function doSpecialOperation(operation, n) {
 
 function calculateFactorial(n) {
     let total = 1;
-    for (let i = 1; i <= n - 1; i++) {
+    for (let i = 2; i <= n; i++) {
         total *= i;
     }
     return total;

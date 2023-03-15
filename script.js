@@ -201,7 +201,7 @@ function doSpecialOperation(operation, n) {
         case "\u{0221A}":
             equation.textContent = `\u{0221A}${equation.textContent}`;
             if (n < 0) {
-                results.textContent = `${n}\u{1D456}`;
+                results.textContent = `\u{1D456}\u{0221A}${Math.abs(n)}`;
                 break;
             }
             showAnswer(Math.sqrt(n));

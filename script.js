@@ -47,8 +47,8 @@ for (let i = 0; i < simpleOperations.length; i++) {
         isSpecial = false;
         operationInUse = simpleOperations[i].value;
 
-        if (chainingOperations()) {
-            equation.textContent += `${parseFloat(results.textContent)} ${operationInUse} `;
+        if (answerGiven) {
+            equation.textContent = `${parseFloat(results.textContent)} ${operationInUse} `;
             results.textContent = "";
             
             answerGiven = false;
@@ -93,9 +93,9 @@ equals.addEventListener("click", function() {
         return;
     }
 
+    // if user presses enters only a number and presses =
     if (operationInUse === "none") {
         results.textContent = `${parseFloat(equation.textContent)}`;
-        equation.textContent = "";
         answerGiven = true;
         calculationRunning = false;  
         return;
@@ -103,11 +103,6 @@ equals.addEventListener("click", function() {
 
     showAnswer();
 });
-
-
-function chainingOperations() {
-    return (equation.textContent === "" && results.textContent !== "");
-}
 
 function divideByZero(operation, b) {
     return (operationInUse === "\u{000F7}" && b === 0);
@@ -126,7 +121,7 @@ function toScientificNotation(n) {
     let N = parseInt(numberOfDigits) - 10;
     let tenDigitNumber = Math.round(n / (10 ** N));
     let shortNumber = Math.round(tenDigitNumber / (10 ** 5)) / 10000;
-    return `${shortNumber}\u1D07+${numberOfDigits - 1}`;
+    return `${shortNumber}e+${numberOfDigits - 1}`;
 }
 
 
@@ -152,17 +147,12 @@ function calculateWithFloat(a, b) {
 function showAnswer() {
     a = parseFloat(equation.textContent);
     b = parseFloat(equation.textContent.slice(equationLength));
-    equation.textContent = "";
 
-    if (divideByZero(operationInUse, b)) {
-        results.textContent = "Math Error";
-        answerGiven = true;
-        calculationRunning = false;
-        return;
-    }
-    
     let answer = isFloat(a, b) ? calculateWithFloat(a, b) : calculate(a, b);
-    if (hasTooManyDecimals(answer)) {
+    if (divideByZero(operationInUse, b)) {
+        answer = "Math Error";
+    }
+    else if (hasTooManyDecimals(answer)) {
         answer = Math.round(answer * 10000) / 10000;
     }
     if (answer > 9999999999) {

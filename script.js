@@ -22,12 +22,17 @@ clear.addEventListener("click", function() {
     results.textContent = "";
     calculationRunning = false;
     answerGiven = false;
+    dot.disabled = false;
 });
 
 const backspace = document.querySelector("#backspace");
 backspace.addEventListener("click", function() {
-    let backspaced = results.textContent.slice(0, -1);
-    results.textContent = `${backspaced}`;
+    let backspaced = equation.textContent.slice(0, -1);
+    equation.textContent = `${backspaced}`;
+
+    if (!backspaced.includes(".")) {
+        dot.disabled = false;
+    }
 });
 
 const numbers = document.querySelectorAll(".number");
@@ -40,9 +45,13 @@ for (let i = 0; i < numbers.length; i++) {
     });
 }
 
+const dot = document.querySelector("#dot");
+dot.addEventListener("click", () => dot.disabled = true);
+
 const simpleOperations = document.querySelectorAll(".operation");
 for (let i = 0; i < simpleOperations.length; i++) {
     simpleOperations[i].addEventListener("click", function() {
+        dot.disabled = false;
         operationInUse = simpleOperations[i].value;
 
         if (answerGiven) {
@@ -98,6 +107,8 @@ posNeg.addEventListener("click", function() {
 
 const equals = document.querySelector("#equals");
 equals.addEventListener("click", function() {
+    dot.disabled = false;
+
     // clicking = with answer showing does not increment
     if (answerGiven) {
         return;

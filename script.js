@@ -211,7 +211,11 @@ function doSpecialOperation(operation, n) {
             break;
         case "\u{0221A}":
             equation.textContent = `\u{0221A}${equation.textContent}`;
-            if (n < 0) {
+            if (n === "-1") {
+                results.textContent = `\u{1D456}`;
+                break;
+            }
+            else if (n < 0) {
                 results.textContent = `\u{1D456}\u{0221A}${Math.abs(n)}`;
                 break;
             }

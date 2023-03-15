@@ -10,7 +10,7 @@ let equationLength;
 let operationInUse = "none";
 let calculationRunning = false;
 let answerGiven = false;
-let isSpecial = false;
+let specialOperation;
 
 layout.addEventListener("click", changeLayout);
 
@@ -22,7 +22,6 @@ clear.addEventListener("click", function() {
     results.textContent = "";
     calculationRunning = false;
     answerGiven = false;
-    isSpecial = false;
 });
 
 const backspace = document.querySelector("#backspace");
@@ -44,11 +43,14 @@ for (let i = 0; i < numbers.length; i++) {
 const simpleOperations = document.querySelectorAll(".operation");
 for (let i = 0; i < simpleOperations.length; i++) {
     simpleOperations[i].addEventListener("click", function() {
-        isSpecial = false;
         operationInUse = simpleOperations[i].value;
 
         if (answerGiven) {
-            equation.textContent = `${parseFloat(results.textContent)} ${operationInUse} `;
+            let firstNumber = parseFloat(results.textContent);
+            if (firstNumber > 9999999999) {
+                firstNumber = toScientificNotation(firstNumber);
+            }
+            equation.textContent = `${firstNumber} ${operationInUse} `;
             results.textContent = "";
             
             answerGiven = false;
@@ -64,6 +66,20 @@ for (let i = 0; i < simpleOperations.length; i++) {
         calculationRunning = true;
         equation.textContent += ` ${operationInUse} `;
         equationLength = equation.textContent.length;
+    });
+}
+
+const specialOperations = document.querySelectorAll(".special");
+for (let i = 0; i < specialOperations.length; i++) {
+    specialOperations[i].addEventListener("click", function() {
+        let a = equation.textContent;
+
+        if (answerGiven) {
+            a = results.textContent;
+            equation.textContent = results.textContent;
+        }
+
+        doSpecialOperation(specialOperations[i].value, a);
     });
 }
 
@@ -87,12 +103,6 @@ equals.addEventListener("click", function() {
         return;
     }
 
-    // prevent normal = function for special operation syntax
-    if (isSpecial) {
-        doSpecialOperation(operationInUse);
-        return;
-    }
-
     // if user presses enters only a number and presses =
     if (operationInUse === "none") {
         results.textContent = `${parseFloat(equation.textContent)}`;
@@ -101,14 +111,15 @@ equals.addEventListener("click", function() {
         return;
     }
 
-    showAnswer();
+    calculateAnswer();
 });
+
 
 function divideByZero(operation, b) {
     return (operationInUse === "\u{000F7}" && b === 0);
 }
 
-function isFloat(a, b) {
+function isFloat(a, b = 0) {
     return (a % 1 !== 0 || b % 1 !== 0);
 }
 
@@ -124,7 +135,6 @@ function toScientificNotation(n) {
     return `${shortNumber}e+${numberOfDigits - 1}`;
 }
 
-
 function calculate(a, b) {
     return (operationInUse === "\u{000D7}") ? a * b
          : (operationInUse === "\u{000F7}") ? a / b
@@ -139,24 +149,33 @@ function calculateWithFloat(a, b) {
     return (operationInUse === "\u{000D7}") ? (a * CF) * (b * CF) / (CF ** 2)
          : (operationInUse === "\u{000F7}") ? (a * CF) / (b * CF)
          : (operationInUse === "\u{0002B}") ? ((a * CF) + (b * CF)) / CF
-         : (operationInUse === "\u{02212}") ? (a * CF) - (b * CF) / CF
+         : (operationInUse === "\u{02212}") ? ((a * CF) - (b * CF)) / CF
          : (operationInUse === "^") ? a ** b
          : parseFloat(results.textContent);
 }
 
-function showAnswer() {
+function calculateAnswer() {
     a = parseFloat(equation.textContent);
     b = parseFloat(equation.textContent.slice(equationLength));
 
     let answer = isFloat(a, b) ? calculateWithFloat(a, b) : calculate(a, b);
+
+    showAnswer(answer);
+}
+
+function showAnswer(answer) {
     if (divideByZero(operationInUse, b)) {
         answer = "Math Error";
     }
     else if (hasTooManyDecimals(answer)) {
         answer = Math.round(answer * 10000) / 10000;
     }
-    if (answer > 9999999999) {
+
+    if (answer > 9999999999 && answer < 1e21) {
         answer = toScientificNotation(answer);
+    }
+    else if (answer >= 1e21) {
+        answer = "Huge Number";
     }
 
     results.textContent = `${answer}`;
@@ -165,22 +184,42 @@ function showAnswer() {
     calculationRunning = false;
 }
 
-// function doSpecialOperation(operation) {
-//     switch (operation) {
-//         case "!":
-//             factorial();
-//             break;
-//         case "%":
-//             percent();
-//             break;
-//         case "\u{0221A}":
-//             squareRoot();
-//             break;
-//         case "\u03C0":
-//             pi();
-//             break;
-//     }
-// }
+function doSpecialOperation(operation, n) {
+    switch (operation) {
+        case "!":
+            equation.textContent += "!";
+            if (isFloat(n) || n < 0) {
+                results.textContent = "Math Error";
+                break;
+            }
+            showAnswer(calculateFactorial(n));
+            break;
+        case "%":
+            equation.textContent += "%";
+            showAnswer(n / 100);
+            break;
+        case "\u{0221A}":
+            equation.textContent = `\u{0221A}${equation.textContent}`;
+            if (n < 0) {
+                results.textContent = `${n}\u{1D456}`;
+                break;
+            }
+            showAnswer(Math.sqrt(n));
+            break;
+        case "\u03C0":
+            equation.textContent += " \u{000D7} \u{1D70B}";
+            showAnswer(n * Math.PI);
+            break;
+    }
+}
+
+function calculateFactorial(n) {
+    let total = 1;
+    for (let i = 1; i <= n - 1; i++) {
+        total *= i;
+    }
+    return total;
+}
 
 function changeLayout() {
     const extraButtons = document.querySelectorAll(".extra");

@@ -54,17 +54,11 @@ for (let i = 0; i < simpleOperations.length; i++) {
         dot.disabled = false;
         operationInUse = simpleOperations[i].value;
 
-        if (answerGiven) {
-            let firstNumber = parseFloat(results.textContent);
-            if (firstNumber > 9999999999) {
-                firstNumber = toScientificNotation(firstNumber);
-            }
-            equation.textContent = `${firstNumber} ${operationInUse} `;
-            results.textContent = "";
-            
-            answerGiven = false;
-            calculationRunning = true;
-            equationLength = equation.textContent.length;
+        if (!isFirstNumberPresent()) {
+            return;
+        }
+        else if (answerGiven) {
+            chainOperation();
             return;
         }
         
@@ -94,7 +88,14 @@ for (let i = 0; i < specialOperations.length; i++) {
 
 const posNeg = document.querySelector("#pos-neg");
 posNeg.addEventListener("click", function() {
-    if (operationInUse === "none") {
+    if (answerGiven) {
+        return;
+    }
+    else if (isEquationEmpty()) {
+        results.textContent = "Please enter a number first";
+        answerGiven = true;
+    }
+    else if (operationInUse === "none") {
         let number = parseFloat(equation.textContent)
         equation.textContent = (number < 0) ? `${Math.abs(number)}` : `${-Math.abs(number)}`;
     }
@@ -126,8 +127,40 @@ equals.addEventListener("click", function() {
 });
 
 
-function divideByZero(operation, b) {
+function divideByZero() {
     return (operationInUse === "\u{000F7}" && b === 0);
+}
+
+
+function isEquationEmpty() {
+    return (equation.textContent === "");
+}
+
+function isFirstNumberPresent() {
+    if (isEquationEmpty() && operationInUse === "\u{02212}") {
+        results.textContent = "Please use the +/- button";
+        answerGiven = true;
+        return false;
+    }
+    else if (isEquationEmpty()) {
+        results.textContent = "Please enter a number first";
+        answerGiven = true;
+        return false;
+    }
+    return true;
+}
+
+function chainOperation() {
+    let firstNumber = parseFloat(results.textContent);
+    if (firstNumber > 9999999999) {
+        firstNumber = toScientificNotation(firstNumber);
+    }
+    equation.textContent = `${firstNumber} ${operationInUse} `;
+    results.textContent = "";
+    
+    answerGiven = false;
+    calculationRunning = true;
+    equationLength = equation.textContent.length;
 }
 
 function isFloat(a, b = 0) {
@@ -175,8 +208,8 @@ function calculateAnswer() {
 }
 
 function showAnswer(answer) {
-    if (divideByZero(operationInUse, b)) {
-        answer = "Math Error";
+    if (divideByZero()) {
+        answer = showRandomError();
     }
     else if (hasTooManyDecimals(answer)) {
         answer = Math.round(answer * 10000) / 10000;
@@ -195,21 +228,42 @@ function showAnswer(answer) {
     calculationRunning = false;
 }
 
+function showRandomError() {
+    let roll = Math.floor(Math.random() * 4);
+    return roll === 0 ? "I refuse."
+         : roll === 1 ? "Please no..."
+         : roll === 2 ? "......no"
+         : "KABOOM!";
+}
+
 function doSpecialOperation(operation, n) {
     switch (operation) {
         case "!":
+            if(!isFirstNumberPresent()) {
+                equation.textContent += "0";
+            }
+
             equation.textContent += "!";
             if (isFloat(n) || n < 0) {
                 results.textContent = "Math Error";
                 break;
             }
+
             showAnswer(calculateFactorial(n));
             break;
         case "%":
+            if(!isFirstNumberPresent()) {
+                equation.textContent += "0";
+            }
+
             equation.textContent += "%";
             showAnswer(n / 100);
             break;
         case "\u{0221A}":
+            if(!isFirstNumberPresent()) {
+                equation.textContent += "0";
+            }
+
             equation.textContent = `\u{0221A}${equation.textContent}`;
             if (n === "-1") {
                 results.textContent = `\u{1D456}`;
@@ -222,7 +276,10 @@ function doSpecialOperation(operation, n) {
             showAnswer(Math.sqrt(n));
             break;
         case "\u03C0":
-            equation.textContent += " \u{000D7} \u{1D70B}";
+            if(!isFirstNumberPresent()) {
+                equation.textContent += "0";
+            }
+            equation.textContent += "\u{1D70B}";
             showAnswer(n * Math.PI);
             break;
     }
@@ -236,6 +293,7 @@ function calculateFactorial(n) {
     return total;
 }
 
+// Layout functions
 function changeLayout() {
     const extraButtons = document.querySelectorAll(".extra");
     extraButtons.forEach(extraButton => extraButton.classList.toggle("hidden"));

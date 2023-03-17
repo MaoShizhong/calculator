@@ -276,8 +276,9 @@ function doSpecialOperation(operation, n) {
             showAnswer(Math.sqrt(n));
             break;
         case "\u03C0":
-            if(!isFirstNumberPresent()) {
-                equation.textContent += "0";
+            if(!isFirstNumberPresent() || equation.textContent === "1") {
+                equation.textContent = "";
+                n = 1;
             }
             equation.textContent += "\u{1D70B}";
             showAnswer(n * Math.PI);

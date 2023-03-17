@@ -27,9 +27,20 @@ clear.addEventListener("click", function() {
 
 const backspace = document.querySelector("#backspace");
 backspace.addEventListener("click", function() {
-    let backspaced = equation.textContent.slice(0, -1);
-    equation.textContent = `${backspaced}`;
-
+    let backspaced;
+    // first half of equation
+    if (operationInUse === "none") {
+        backspaced = equation.textContent.slice(0, -1);
+        equation.textContent = `${backspaced}`;
+    }
+    // second half of equation
+    else {
+        let firstHalf = equation.textContent.slice(0, equationLength);
+        let secondHalf = equation.textContent.slice(equationLength);
+        backspaced = secondHalf.slice(0, -1);
+        equation.textContent = `${firstHalf}${backspaced}`;
+    }
+    
     if (!backspaced.includes(".")) {
         dot.disabled = false;
     }

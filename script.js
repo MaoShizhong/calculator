@@ -146,7 +146,7 @@ function isEquationEmpty() {
 
 function isFullEquation() {
     let lastTwoCharacters = parseInt(equation.textContent.slice(-2));
-    if (includesOperation() && typeof lastTwoCharacters == "number") {
+    if (includesOperation() && typeof lastTwoCharacters == "number" && !isNaN(lastTwoCharacters)) {
         return true;
     }
     return false;

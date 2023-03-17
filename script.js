@@ -52,12 +52,19 @@ const simpleOperations = document.querySelectorAll(".operation");
 for (let i = 0; i < simpleOperations.length; i++) {
     simpleOperations[i].addEventListener("click", function() {
         dot.disabled = false;
-        operationInUse = simpleOperations[i].value;
 
         if (!isFirstNumberPresent()) {
             return;
         }
+        // chaining operations without pressing =
+        else if (isFullEquation() && answerGiven === false) {
+            equals.click();
+            simpleOperations[i].click();
+            return;     
+        }
+        // chaining operations after pressing =
         else if (answerGiven) {
+            operationInUse = simpleOperations[i].value;
             chainOperation();
             return;
         }
@@ -66,6 +73,7 @@ for (let i = 0; i < simpleOperations.length; i++) {
             equation.textContent = equation.textContent.slice(0, -3);
         }
 
+        operationInUse = simpleOperations[i].value;
         calculationRunning = true;
         equation.textContent += ` ${operationInUse} `;
         equationLength = equation.textContent.length;
@@ -134,6 +142,19 @@ function divideByZero() {
 
 function isEquationEmpty() {
     return (equation.textContent === "");
+}
+
+function isFullEquation() {
+    let lastTwoCharacters = parseInt(equation.textContent.slice(-2));
+    if (includesOperation() && typeof lastTwoCharacters == "number") {
+        return true;
+    }
+    return false;
+}
+
+function includesOperation() {
+    const operators = ["^", "\u{02212}", "\u{000D7}", "\u{000F7}", "\u{0002B}"];
+    return operators.some(operator => equation.textContent.includes(operator));
 }
 
 function isFirstNumberPresent() {
